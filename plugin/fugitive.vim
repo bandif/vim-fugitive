@@ -16,33 +16,7 @@ let s:bad_git_dir = '/$\|^fugitive:'
 " Fugitive is active in the current buffer.  Do not rely on this for direct
 " filesystem access; use FugitiveFind('.git/whatever') instead.
 function! FugitiveGitDir(...) abort
-  if v:version < 704
-    return ''
-  elseif !a:0 || type(a:1) == type(0) && a:1 < 0 || a:1 is# get(v:, 'true', -1)
-    if exists('g:fugitive_event')
-      return g:fugitive_event
-    endif
-    let dir = get(b:, 'git_dir', '')
-    if empty(dir) && (empty(bufname('')) || &buftype =~# '^\%(nofile\|acwrite\|quickfix\|terminal\|prompt\)$')
-      return FugitiveExtractGitDir(getcwd())
-    elseif (!exists('b:git_dir') || b:git_dir =~# s:bad_git_dir) && &buftype =~# '^\%(nowrite\)\=$'
-      let b:git_dir = FugitiveExtractGitDir(bufnr(''))
-      return b:git_dir
-    endif
-    return dir =~# s:bad_git_dir ? '' : dir
-  elseif type(a:1) == type(0) && a:1 isnot# 0
-    if a:1 == bufnr('') && (!exists('b:git_dir') || b:git_dir =~# s:bad_git_dir) && &buftype =~# '^\%(nowrite\)\=$'
-      let b:git_dir = FugitiveExtractGitDir(a:1)
-    endif
-    let dir = getbufvar(a:1, 'git_dir')
-    return dir =~# s:bad_git_dir ? '' : dir
-  elseif type(a:1) == type('')
-    return substitute(s:Slash(a:1), '/$', '', '')
-  elseif type(a:1) == type({})
-    return get(a:1, 'fugitive_dir', get(a:1, 'git_dir', ''))
-  else
-    return ''
-  endif
+  return FugitiveExtractGitDir(getcwd())
 endfunction
 
 " FugitiveReal() takes a fugitive:// URL and returns the corresponding path in
